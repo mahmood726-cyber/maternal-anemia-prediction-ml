@@ -1,0 +1,27 @@
+=== Anemia Prediction ML Model Summary ===
+Total Cohort Size (Clean): 335
+Anemic Cases: 45 (13.43%)
+Non-Anemic Cases: 290
+
+--- Out-of-Fold Performance (5-Fold Stratified CV) ---
+
+Logistic Regression:
+  Accuracy:  0.6687
+  ROC AUC:   0.6839
+  Precision: 0.2386
+  Recall:    0.6222
+  F1-Score:  0.3418
+
+Random Forest:
+  Accuracy:  0.7403
+  ROC AUC:   0.6533
+  Precision: 0.1977
+  Recall:    0.3333
+  F1-Score:  0.2473
+
+Gradient Boosting:
+  Accuracy:  0.8418
+  ROC AUC:   0.6759
+  Precision: 0.3907
+  Recall:    0.2000
+  F1-Score:  0.2536

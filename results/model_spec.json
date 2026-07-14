@@ -1,0 +1,79 @@
+{
+    "model_type": "Logistic Regression (Balanced)",
+    "features": [
+        "RIDAGEYR",
+        "INDFMPIR",
+        "DMDFMSIZ",
+        "RIDRETH1_2",
+        "RIDRETH1_3",
+        "RIDRETH1_4",
+        "RIDRETH1_5",
+        "DMDEDUC2_2",
+        "DMDEDUC2_3",
+        "DMDEDUC2_4",
+        "DMDEDUC2_5",
+        "DMDMARTL_3",
+        "DMDMARTL_4",
+        "DMDMARTL_5",
+        "DMDMARTL_6"
+    ],
+    "coefficients": [
+        0.39682647693209355,
+        -0.154583102252816,
+        -0.07143260762307735,
+        0.027847956644575452,
+        -0.304105411021048,
+        0.5945421005367236,
+        1.442387804327059,
+        -0.5967570038723271,
+        0.11668368472751353,
+        0.26474758983523805,
+        -0.6917601872169323,
+        -0.2614202288698862,
+        -0.2471111623418821,
+        1.3702643603981925,
+        0.7843917484869259
+    ],
+    "intercept": -0.8621280212936199,
+    "scaling": {
+        "continuous_features": [
+            "RIDAGEYR",
+            "INDFMPIR",
+            "DMDFMSIZ"
+        ],
+        "means": [
+            28.73134328358209,
+            2.1172388059701497,
+            3.6686567164179102
+        ],
+        "stds": [
+            5.92233840855451,
+            1.545441366600032,
+            1.5855889206979104
+        ]
+    },
+    "categorical_mappings": {
+        "RIDRETH1": {
+            "1": "Mexican American",
+            "2": "Other Hispanic",
+            "3": "Non-Hispanic White",
+            "4": "Non-Hispanic Black",
+            "5": "Other Race (including Multi-Racial)"
+        },
+        "DMDEDUC2": {
+            "1": "Less than 9th grade",
+            "2": "9-11th grade (includes 12th grade no diploma)",
+            "3": "High school graduate / GED",
+            "4": "Some college or AA degree",
+            "5": "College graduate or above"
+        },
+        "DMDMARTL": {
+            "1": "Married",
+            "2": "Widowed",
+            "3": "Divorced",
+            "4": "Separated",
+            "5": "Never married",
+            "6": "Living with partner"
+        }
+    }
+}

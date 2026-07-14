@@ -1,0 +1,17 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pkl
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Project-specific caches
+data/raw/
+*.xpt
+*.XPT
