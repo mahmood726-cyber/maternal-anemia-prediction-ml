@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maternal Anemia Risk Predictor & Machine Learning Dashboard</title>
-    <meta name="description" content="An interactive public health dashboard and machine learning model predictor for maternal anemia risk in pregnant women, developed using CDC NHANES demographic data (2007-2018).">
+    <meta name="description" content="An interactive public health dashboard and machine learning risk tool comparing maternal anemia predictors in the US (NHANES) and Uganda (DHS 2016) using demographic SDoH datasets.">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,9 +13,9 @@
     
     <style>
         :root {
-            --bg-color: #0f0a1c;
-            --card-bg: rgba(26, 21, 44, 0.6);
-            --border-color: rgba(147, 51, 234, 0.2);
+            --bg-color: #0d081b;
+            --card-bg: rgba(22, 16, 42, 0.7);
+            --border-color: rgba(168, 85, 247, 0.25);
             --accent-color: #a855f7;
             --accent-glow: rgba(168, 85, 247, 0.4);
             --text-main: #f3f4f6;
@@ -35,8 +35,8 @@
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             background-image: 
-                radial-gradient(at 0% 0%, rgba(124, 58, 237, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(219, 39, 119, 0.1) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.12) 0px, transparent 50%);
             color: var(--text-main);
             min-height: 100vh;
             padding: 2rem 1rem;
@@ -50,14 +50,14 @@
 
         header {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 2.5rem;
         }
 
         h1 {
             font-family: 'Outfit', sans-serif;
             font-size: 2.5rem;
             font-weight: 800;
-            background: linear-gradient(135deg, #f472b6, #c084fc, #818cf8);
+            background: linear-gradient(135deg, #f472b6, #c084fc, #6366f1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 0.5rem;
@@ -67,11 +67,47 @@
         .subtitle {
             color: var(--text-muted);
             font-size: 1.1rem;
-            max-width: 700px;
+            max-width: 750px;
             margin: 0 auto;
         }
 
-        /* Responsive Grid layout */
+        /* Toggle Button Group */
+        .cohort-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 9999px;
+            padding: 0.35rem;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+            backdrop-filter: blur(8px);
+        }
+
+        .cohort-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 9999px;
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .cohort-btn.active {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        /* Grid Layout */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -80,24 +116,24 @@
 
         @media (min-width: 900px) {
             .dashboard-grid {
-                grid-template-columns: 1.1fr 0.9fr;
+                grid-template-columns: 1.15fr 0.85fr;
             }
         }
 
-        /* Glassmorphism Card Style */
+        /* Cards */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 1.25rem;
             padding: 2rem;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 10px 40px -15px rgba(0, 0, 0, 0.6);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .card:hover {
-            box-shadow: 0 15px 35px -5px rgba(168, 85, 247, 0.15);
+            box-shadow: 0 15px 35px -5px rgba(168, 85, 247, 0.18);
         }
 
         .card h2 {
@@ -105,14 +141,14 @@
             font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             padding-bottom: 0.75rem;
             color: #c084fc;
         }
 
-        /* Form elements styling */
+        /* Forms */
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
         label {
@@ -123,9 +159,9 @@
             margin-bottom: 0.5rem;
         }
 
-        select, input[type="range"], input[type="number"] {
+        select, input[type="range"] {
             width: 100%;
-            background-color: rgba(15, 10, 28, 0.8);
+            background-color: rgba(15, 10, 28, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 0.5rem;
             padding: 0.75rem;
@@ -136,7 +172,7 @@
             transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        select:focus, input[type="number"]:focus {
+        select:focus {
             border-color: var(--accent-color);
             box-shadow: 0 0 0 2px var(--accent-glow);
         }
@@ -150,11 +186,11 @@
         .range-val {
             font-weight: 600;
             color: var(--text-main);
-            background: rgba(168, 85, 247, 0.1);
+            background: rgba(168, 85, 247, 0.12);
             border: 1px solid var(--border-color);
             border-radius: 0.375rem;
             padding: 0.25rem 0.5rem;
-            min-width: 3rem;
+            min-width: 3.25rem;
             text-align: center;
             font-size: 0.875rem;
         }
@@ -186,6 +222,13 @@
             transform: scale(1.2);
         }
 
+        .form-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.35rem;
+            display: block;
+        }
+
         /* Results / Gauge display */
         .predictor-results {
             display: flex;
@@ -209,7 +252,7 @@
 
         .gauge-bg {
             fill: none;
-            stroke: rgba(255, 255, 255, 0.05);
+            stroke: rgba(255, 255, 255, 0.04);
             stroke-width: 16px;
         }
 
@@ -218,7 +261,7 @@
             stroke: var(--success);
             stroke-width: 16px;
             stroke-linecap: round;
-            stroke-dasharray: 565.48; /* 2 * pi * r (r=90) */
+            stroke-dasharray: 565.48;
             stroke-dashoffset: 565.48;
             transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.8s ease;
         }
@@ -248,7 +291,7 @@
 
         .risk-badge {
             display: inline-block;
-            padding: 0.35rem 1rem;
+            padding: 0.35rem 1.2rem;
             border-radius: 9999px;
             font-size: 0.875rem;
             font-weight: 600;
@@ -277,7 +320,7 @@
         }
 
         .guidance-box {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.02);
             border-radius: 0.75rem;
             padding: 1.25rem;
             width: 100%;
@@ -295,9 +338,10 @@
         .guidance-box p {
             font-size: 0.875rem;
             color: var(--text-muted);
+            line-height: 1.6;
         }
 
-        /* Model statistics grid */
+        /* Model stats grid */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -334,7 +378,7 @@
             letter-spacing: 0.05em;
         }
 
-        /* Model plots / Tabs or images gallery */
+        /* Diagnostic plots gallery */
         .image-gallery {
             display: grid;
             grid-template-columns: 1fr;
@@ -376,7 +420,6 @@
             transform: scale(1.03);
         }
 
-        /* Footer styling */
         footer {
             text-align: center;
             margin-top: 4rem;
@@ -391,13 +434,19 @@
     <div class="container">
         <header>
             <h1>Maternal Anemia Risk Dashboard</h1>
-            <p class="subtitle">An interactive demographic machine learning risk tool trained on CDC NHANES public health survey cohorts (2007-2018)</p>
+            <p class="subtitle">An interactive demographic machine learning risk predictor comparing clinical cohorts in the US and Uganda</p>
         </header>
 
+        <!-- Cohort Switcher -->
+        <div class="cohort-selector">
+            <button class="cohort-btn active" id="btn-nhanes" onclick="switchCohort('nhanes')">US Cohort (NHANES)</button>
+            <button class="cohort-btn" id="btn-uganda" onclick="switchCohort('uganda')">Uganda Cohort (DHS 2016)</button>
+        </div>
+
         <main class="dashboard-grid">
-            <!-- Left Side: Interactive Risk Predictor Form -->
+            <!-- Left Side: Dynamic Calculator Form -->
             <section class="card">
-                <h2>1. Anemia Risk Calculator</h2>
+                <h2 id="calculator-title">1. US Cohort Anemia Risk Calculator</h2>
                 <form id="predictor-form" oninput="calculateRisk()">
                     
                     <div class="form-group">
@@ -408,7 +457,8 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <!-- Dynamic field: Race (NHANES only) -->
+                    <div class="form-group" id="race-group">
                         <label for="race-input">Race / Ethnicity</label>
                         <select id="race-input">
                             <option value="1">Mexican American</option>
@@ -419,42 +469,64 @@
                         </select>
                     </div>
 
-                    <div class="form-group">
+                    <!-- Dynamic field: Residence (Uganda DHS only) -->
+                    <div class="form-group" id="residence-group" style="display: none;">
+                        <label for="residence-input">Type of Residence</label>
+                        <select id="residence-input">
+                            <option value="1">Urban</option>
+                            <option value="2" selected>Rural</option>
+                        </select>
+                    </div>
+
+                    <!-- Continuous Poverty slider / Wealth dropdown -->
+                    <div class="form-group" id="pir-group">
                         <label for="pir-input">Family Poverty Income Ratio (PIR)</label>
                         <div class="range-container">
                             <input type="range" id="pir-input" min="0" max="5" step="0.1" value="2.2">
                             <span class="range-val" id="pir-val">2.2</span>
                         </div>
-                        <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; display: block;">
+                        <span class="form-desc">
                             Ratio of family income to the federal poverty threshold. 0.0 = no income, 1.0 = at poverty line, 5.0 = high income.
                         </span>
                     </div>
 
+                    <div class="form-group" id="wealth-group" style="display: none;">
+                        <label for="wealth-input">Household Wealth Quintile</label>
+                        <select id="wealth-input">
+                            <option value="1">Poorest</option>
+                            <option value="2">Poorer</option>
+                            <option value="3" selected>Middle</option>
+                            <option value="4">Richer</option>
+                            <option value="5">Richest</option>
+                        </select>
+                    </div>
+
+                    <!-- Education Level (Values/categories vary) -->
                     <div class="form-group">
                         <label for="edu-input">Education Level</label>
                         <select id="edu-input">
-                            <option value="1">Less than 9th Grade</option>
-                            <option value="2">9-11th Grade (No Diploma)</option>
-                            <option value="3">High School Graduate / GED</option>
-                            <option value="4" selected>Some College or AA Degree</option>
-                            <option value="5">College Graduate or Above</option>
+                            <!-- Options dynamically populated by JS -->
+                        </select>
+                    </div>
+
+                    <!-- Dynamic field: Drinking Water Source (Uganda DHS only) -->
+                    <div class="form-group" id="water-group" style="display: none;">
+                        <label for="water-input">Household Drinking Water Source</label>
+                        <select id="water-input">
+                            <option value="1" selected>Improved Source (Piped/Protected Well/Rainwater)</option>
+                            <option value="2">Unimproved Source (Unprotected Well/Surface Water/River)</option>
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label for="marital-input">Marital Status</label>
                         <select id="marital-input">
-                            <option value="1" selected>Married</option>
-                            <option value="2">Widowed</option>
-                            <option value="3">Divorced</option>
-                            <option value="4">Separated</option>
-                            <option value="5">Never Married</option>
-                            <option value="6">Living with Partner</option>
+                            <!-- Options dynamically populated by JS -->
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="fmsiz-input">Family Size (Persons)</label>
+                        <label for="fmsiz-input" id="fmsiz-label">Family Size (Persons)</label>
                         <div class="range-container">
                             <input type="range" id="fmsiz-input" min="1" max="10" value="4">
                             <span class="range-val" id="fmsiz-val">4</span>
@@ -488,188 +560,367 @@
             </section>
         </main>
 
-        <!-- Bottom Card: Model Training & Diagnostics Gallery -->
+        <!-- Bottom Card: Model Diagnostics & Plots -->
         <section class="card" style="margin-top: 2rem;">
-            <h2>3. Machine Learning Diagnostics & Performance</h2>
+            <h2 id="diagnostics-title">3. Machine Learning Diagnostics & Performance</h2>
             
             <div class="metrics-grid">
                 <div class="metric-card">
-                    <div class="metric-value">335</div>
+                    <div class="metric-value" id="metric-n">335</div>
                     <div class="metric-label">Cohort Size (N)</div>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-value">0.684</div>
+                    <div class="metric-value" id="metric-auc">0.684</div>
                     <div class="metric-label">ROC AUC</div>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-value">66.9%</div>
+                    <div class="metric-value" id="metric-acc">66.9%</div>
                     <div class="metric-label">Accuracy</div>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-value">62.2%</div>
+                    <div class="metric-value" id="metric-recall">62.2%</div>
                     <div class="metric-label">Recall (Sensitivity)</div>
                 </div>
             </div>
 
-            <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem;">
-                The prediction is powered by a Logistic Regression model trained via Stratified 5-Fold Cross-Validation. This model operates strictly on <strong>demographic social determinants of health</strong> (without clinical lab values), enabling initial community risk stratification. The overall ROC AUC of 0.684 reflects moderate prediction capability, striking a screening-first balance with a 62.2% sensitivity (Recall) to identify high-risk individuals.
+            <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem;" id="diagnostics-text">
+                The prediction is powered by a Logistic Regression model trained via Stratified 5-Fold Cross-Validation. This model operates strictly on demographic social determinants of health (without clinical lab values), enabling initial community risk stratification. The overall ROC AUC of 0.684 reflects moderate prediction capability, striking a screening-first balance with a 62.2% sensitivity (Recall) to identify high-risk individuals.
             </p>
 
             <div class="image-gallery">
                 <div class="plot-container">
-                    <img class="plot-img" src="roc_curves.png" alt="Out-of-Fold ROC Curves comparing Logistic Regression, Random Forest and Gradient Boosting models">
+                    <img class="plot-img" id="plot-roc" src="roc_curves.png" alt="ROC Curves">
                     <p>ROC Curves (AUC)</p>
                 </div>
                 <div class="plot-container">
-                    <img class="plot-img" src="feature_importance.png" alt="Feature importance scores for demographic features in the Random Forest model">
+                    <img class="plot-img" id="plot-imp" src="feature_importance.png" alt="Feature Importance">
                     <p>Feature Importance</p>
                 </div>
                 <div class="plot-container">
-                    <img class="plot-img" src="confusion_matrix.png" alt="Confusion Matrix representing out-of-fold classifications">
+                    <img class="plot-img" id="plot-cm" src="confusion_matrix.png" alt="Confusion Matrix">
                     <p>Confusion Matrix</p>
                 </div>
             </div>
         </section>
 
         <footer>
-            <p>Developed with CDC NHANES Public Health demographic cohorts. For educational and research purposes only. Not intended to serve as clinical decision support.</p>
+            <p>Developed with public health demographic survey cohorts (CDC NHANES and USAID DHS). For educational and research purposes only. Not intended to serve as clinical decision support.</p>
         </footer>
     </div>
 
     <!-- JavaScript Model Execution Code -->
     <script>
-        // Model parameters exported from Python
-        const INTERCEPT = -0.862088;
-        const COEFFICIENTS = {
-            "RIDAGEYR": 0.396781,
-            "INDFMPIR": -0.154625,
-            "DMDFMSIZ": -0.071415,
-            "RIDRETH1_2": 0.027818,
-            "RIDRETH1_3": -0.304052,
-            "RIDRETH1_4": 0.594537,
-            "RIDRETH1_5": 1.442436,
-            "DMDEDUC2_2": -0.596811,
-            "DMDEDUC2_3": 0.116664,
-            "DMDEDUC2_4": 0.264669,
-            "DMDEDUC2_5": -0.691799,
-            "DMDMARTL_3": -0.261394,
-            "DMDMARTL_4": -0.247141,
-            "DMDMARTL_5": 1.370335,
-            "DMDMARTL_6": 0.784405
-        };
-
-        // Scaling statistics (means and stds of continuous features)
-        const SCALING = {
-            "means": {
-                "RIDAGEYR": 28.731343,
-                "INDFMPIR": 2.179333,
-                "DMDFMSIZ": 3.668657
+        // --- Model Parameters ---
+        const NHANES_MODEL = {
+            intercept: -0.862088,
+            coefficients: {
+                "Age": 0.396781,
+                "INDFMPIR": -0.154625,
+                "FamilySize": -0.071415,
+                "race_2": 0.027818,
+                "race_3": -0.304052,
+                "race_4": 0.594537,
+                "race_5": 1.442436,
+                "edu_2": -0.596811,
+                "edu_3": 0.116664,
+                "edu_4": 0.264669,
+                "edu_5": -0.691799,
+                "marital_3": -0.261394,
+                "marital_4": -0.247141,
+                "marital_5": 1.370335,
+                "marital_6": 0.784405
             },
-            "stds": {
-                "RIDAGEYR": 5.922339,
-                "INDFMPIR": 1.621764,
-                "DMDFMSIZ": 1.585590
-            }
+            scaling: {
+                means: { "Age": 28.731343, "INDFMPIR": 2.179333, "FamilySize": 3.668657 },
+                stds: { "Age": 5.922339, "INDFMPIR": 1.621764, "FamilySize": 1.585590 }
+            },
+            baselineRate: 13.4,
+            metrics: { n: "335", auc: "0.684", acc: "66.9%", recall: "62.2%" },
+            infoText: "The US prediction is powered by a Logistic Regression model trained via Stratified 5-Fold Cross-Validation on pooled CDC NHANES (2007-2018) cohorts. This model operates strictly on SDoH variables, enabling early community risk screening. An overall ROC AUC of 0.684 reflects moderate prediction capability, with a 62.2% sensitivity to prioritize catching high-risk individuals.",
+            plots: { roc: "roc_curves.png", imp: "feature_importance.png", cm: "confusion_matrix.png" },
+            eduOptions: [
+                { value: "1", text: "Less than 9th Grade" },
+                { value: "2", text: "9-11th Grade (No Diploma)" },
+                { value: "3", text: "High School Graduate / GED" },
+                { value: "4", text: "Some College or AA Degree", selected: true },
+                { value: "5", text: "College Graduate or Above" }
+            ],
+            maritalOptions: [
+                { value: "1", text: "Married", selected: true },
+                { value: "2", text: "Widowed" },
+                { value: "3", text: "Divorced" },
+                { value: "4", text: "Separated" },
+                { value: "5", text: "Never Married" },
+                { value: "6", text: "Living with Partner" }
+            ]
         };
 
-        function scaleValue(val, name) {
-            return (val - SCALING.means[name]) / SCALING.stds[name];
+        const UGANDA_MODEL = {
+            intercept: -0.191197,
+            coefficients: {
+                "Age": 0.112450,
+                "v190": -0.192949,  // Wealth continuous scaling coef
+                "FamilySize": 0.008243,
+                "residence_rural": 0.158628,
+                "edu_1": 0.031761,
+                "edu_2": -0.072536,
+                "edu_3": -0.216584,
+                "water_unimproved": 0.356483,
+                "marital_1": -0.023830,
+                "marital_2": -0.110102,
+                "marital_3": -0.189580,
+                "marital_4": 0.401689,
+                "marital_5": -0.316966
+            },
+            scaling: {
+                means: { "Age": 26.698, "v190": 2.746, "FamilySize": 4.662 },
+                stds: { "Age": 6.220353, "v190": 1.381841, "FamilySize": 2.022315 }
+            },
+            baselineRate: 38.0,
+            metrics: { n: "1,000", auc: "0.548", acc: "54.9%", recall: "52.2%" },
+            infoText: "The Uganda prediction is powered by a Logistic Regression model trained via Stratified 5-Fold Cross-Validation on the 2016 Uganda DHS dataset. It reflects the national maternal anemia baseline of 38.0%. An ROC AUC of 0.548 indicates that SDoH variables alone carry moderate predictive power, highlighting the importance of environmental factors like unimproved water source (v113) and rural residence (v025) as significant risk drivers in sub-Saharan African contexts.",
+            plots: { roc: "uganda_roc_curves.png", imp: "uganda_feature_importance.png", cm: "uganda_confusion_matrix.png" },
+            eduOptions: [
+                { value: "0", text: "No Education" },
+                { value: "1", text: "Primary Education", selected: true },
+                { value: "2", text: "Secondary Education" },
+                { value: "3", text: "Higher Education" }
+            ],
+            maritalOptions: [
+                { value: "0", text: "Never in Union / Never Married" },
+                { value: "1", text: "Married", selected: true },
+                { value: "2", text: "Living with Partner (Cohabiting)" },
+                { value: "3", text: "Widowed" },
+                { value: "4", text: "Divorced" },
+                { value: "5", text: "Separated" }
+            ]
+        };
+
+        let currentCohort = "nhanes";
+
+        function switchCohort(cohort) {
+            currentCohort = cohort;
+            
+            // Update button styles
+            document.getElementById("btn-nhanes").classList.toggle("active", cohort === "nhanes");
+            document.getElementById("btn-uganda").classList.toggle("active", cohort === "uganda");
+
+            // Update section title
+            const calTitle = document.getElementById("calculator-title");
+            
+            // Toggle form field visibilities
+            if (cohort === "nhanes") {
+                calTitle.textContent = "1. US Cohort Anemia Risk Calculator";
+                document.getElementById("race-group").style.display = "block";
+                document.getElementById("residence-group").style.display = "none";
+                document.getElementById("pir-group").style.display = "block";
+                document.getElementById("wealth-group").style.display = "none";
+                document.getElementById("water-group").style.display = "none";
+                document.getElementById("fmsiz-label").textContent = "Family Size (Persons)";
+                
+                // Set age slider ranges (NHANES range 20-45 in cohort)
+                const ageInput = document.getElementById("age-input");
+                ageInput.min = 20;
+                ageInput.max = 45;
+                if (parseInt(ageInput.value) < 20) ageInput.value = 20;
+                
+                // Set family size slider
+                const fmsizInput = document.getElementById("fmsiz-input");
+                fmsizInput.min = 1;
+                fmsizInput.max = 7;
+                if (parseInt(fmsizInput.value) > 7) fmsizInput.value = 4;
+
+                // Populate dropdowns
+                populateDropdown("edu-input", NHANES_MODEL.eduOptions);
+                populateDropdown("marital-input", NHANES_MODEL.maritalOptions);
+
+            } else {
+                calTitle.textContent = "1. Uganda Cohort Anemia Risk Calculator";
+                document.getElementById("race-group").style.display = "none";
+                document.getElementById("residence-group").style.display = "block";
+                document.getElementById("pir-group").style.display = "none";
+                document.getElementById("wealth-group").style.display = "block";
+                document.getElementById("water-group").style.display = "block";
+                document.getElementById("fmsiz-label").textContent = "Household Size (Persons)";
+                
+                // Set age slider ranges (DHS range 15-49)
+                const ageInput = document.getElementById("age-input");
+                ageInput.min = 15;
+                ageInput.max = 49;
+                
+                // Set family size slider
+                const fmsizInput = document.getElementById("fmsiz-input");
+                fmsizInput.min = 1;
+                fmsizInput.max = 15;
+
+                // Populate dropdowns
+                populateDropdown("edu-input", UGANDA_MODEL.eduOptions);
+                populateDropdown("marital-input", UGANDA_MODEL.maritalOptions);
+            }
+
+            // Update diagnostics views
+            updateDiagnostics(cohort);
+
+            // Re-evaluate risk
+            calculateRisk();
+        }
+
+        function populateDropdown(id, options) {
+            const select = document.getElementById(id);
+            select.innerHTML = "";
+            options.forEach(opt => {
+                const el = document.createElement("option");
+                el.value = opt.value;
+                el.textContent = opt.text;
+                if (opt.selected) el.selected = true;
+                select.appendChild(el);
+            });
+        }
+
+        function updateDiagnostics(cohort) {
+            const m = cohort === "nhanes" ? NHANES_MODEL : UGANDA_MODEL;
+            
+            document.getElementById("diagnostics-title").textContent = `3. Machine Learning Diagnostics & Performance (${cohort.toUpperCase()})`;
+            document.getElementById("metric-n").textContent = m.metrics.n;
+            document.getElementById("metric-auc").textContent = m.metrics.auc;
+            document.getElementById("metric-acc").textContent = m.metrics.acc;
+            document.getElementById("metric-recall").textContent = m.metrics.recall;
+            document.getElementById("diagnostics-text").textContent = m.infoText;
+            
+            document.getElementById("plot-roc").src = m.plots.roc;
+            document.getElementById("plot-imp").src = m.plots.imp;
+            document.getElementById("plot-cm").src = m.plots.cm;
+        }
+
+        function scaleValue(val, mean, std) {
+            return (val - mean) / std;
         }
 
         function calculateRisk() {
-            // Update slider display labels
+            const model = currentCohort === "nhanes" ? NHANES_MODEL : UGANDA_MODEL;
+
+            // Get standard continuous inputs
             const age = parseFloat(document.getElementById("age-input").value);
             document.getElementById("age-val").textContent = age;
-
-            const pir = parseFloat(document.getElementById("pir-input").value);
-            document.getElementById("pir-val").textContent = pir;
 
             const fmsiz = parseFloat(document.getElementById("fmsiz-input").value);
             document.getElementById("fmsiz-val").textContent = fmsiz;
 
-            const race = document.getElementById("race-input").value;
             const edu = document.getElementById("edu-input").value;
             const marital = document.getElementById("marital-input").value;
 
-            // Scale continuous variables
-            const scaledAge = scaleValue(age, "RIDAGEYR");
-            const scaledPir = scaleValue(pir, "INDFMPIR");
-            const scaledFmsiz = scaleValue(fmsiz, "DMDFMSIZ");
+            let z = model.intercept;
 
-            // Calculate z score (dot product)
-            let z = INTERCEPT;
-            z += COEFFICIENTS["RIDAGEYR"] * scaledAge;
-            z += COEFFICIENTS["INDFMPIR"] * scaledPir;
-            z += COEFFICIENTS["DMDFMSIZ"] * scaledFmsiz;
+            if (currentCohort === "nhanes") {
+                const pir = parseFloat(document.getElementById("pir-input").value);
+                document.getElementById("pir-val").textContent = pir;
 
-            // Categorical dummy addition (drop_first implies reference is category 1)
-            if (race === "2") z += COEFFICIENTS["RIDRETH1_2"];
-            else if (race === "3") z += COEFFICIENTS["RIDRETH1_3"];
-            else if (race === "4") z += COEFFICIENTS["RIDRETH1_4"];
-            else if (race === "5") z += COEFFICIENTS["RIDRETH1_5"];
+                const race = document.getElementById("race-input").value;
 
-            if (edu === "2") z += COEFFICIENTS["DMDEDUC2_2"];
-            else if (edu === "3") z += COEFFICIENTS["DMDEDUC2_3"];
-            else if (edu === "4") z += COEFFICIENTS["DMDEDUC2_4"];
-            else if (edu === "5") z += COEFFICIENTS["DMDEDUC2_5"];
+                // Scale continuous
+                const scaledAge = scaleValue(age, model.scaling.means["Age"], model.scaling.stds["Age"]);
+                const scaledPir = scaleValue(pir, model.scaling.means["INDFMPIR"], model.scaling.stds["INDFMPIR"]);
+                const scaledFmsiz = scaleValue(fmsiz, model.scaling.means["FamilySize"], model.scaling.stds["FamilySize"]);
 
-            if (marital === "3") z += COEFFICIENTS["DMDMARTL_3"];
-            else if (marital === "4") z += COEFFICIENTS["DMDMARTL_4"];
-            else if (marital === "5") z += COEFFICIENTS["DMDMARTL_5"];
-            else if (marital === "6") z += COEFFICIENTS["DMDMARTL_6"];
+                z += model.coefficients["Age"] * scaledAge;
+                z += model.coefficients["INDFMPIR"] * scaledPir;
+                z += model.coefficients["FamilySize"] * scaledFmsiz;
 
-            // Sigmoid function
+                // Dummy categories additions
+                if (race === "2") z += model.coefficients["race_2"];
+                else if (race === "3") z += model.coefficients["race_3"];
+                else if (race === "4") z += model.coefficients["race_4"];
+                else if (race === "5") z += model.coefficients["race_5"];
+
+                if (edu === "2") z += model.coefficients["edu_2"];
+                else if (edu === "3") z += model.coefficients["edu_3"];
+                else if (edu === "4") z += model.coefficients["edu_4"];
+                else if (edu === "5") z += model.coefficients["edu_5"];
+
+                if (marital === "3") z += model.coefficients["marital_3"];
+                else if (marital === "4") z += model.coefficients["marital_4"];
+                else if (marital === "5") z += model.coefficients["marital_5"];
+                else if (marital === "6") z += model.coefficients["marital_6"];
+
+            } else {
+                // UGANDA DHS model evaluation
+                const wealth = parseFloat(document.getElementById("wealth-input").value);
+                const residence = document.getElementById("residence-input").value;
+                const water = document.getElementById("water-input").value;
+
+                // Scale continuous variables
+                const scaledAge = scaleValue(age, model.scaling.means["Age"], model.scaling.stds["Age"]);
+                const scaledWealth = scaleValue(wealth, model.scaling.means["v190"], model.scaling.stds["v190"]);
+                const scaledFmsiz = scaleValue(fmsiz, model.scaling.means["FamilySize"], model.scaling.stds["FamilySize"]);
+
+                z += model.coefficients["Age"] * scaledAge;
+                z += model.coefficients["v190"] * scaledWealth;
+                z += model.coefficients["FamilySize"] * scaledFmsiz;
+
+                // Categorical features additions
+                if (residence === "2") z += model.coefficients["residence_rural"];
+                
+                if (edu === "1") z += model.coefficients["edu_1"];
+                else if (edu === "2") z += model.coefficients["edu_2"];
+                else if (edu === "3") z += model.coefficients["edu_3"];
+
+                if (water === "2") z += model.coefficients["water_unimproved"];
+
+                if (marital === "1") z += model.coefficients["marital_1"];
+                else if (marital === "2") z += model.coefficients["marital_2"];
+                else if (marital === "3") z += model.coefficients["marital_3"];
+                else if (marital === "4") z += model.coefficients["marital_4"];
+                else if (marital === "5") z += model.coefficients["marital_5"];
+            }
+
+            // Sigmoid formula
             const riskProb = 1 / (1 + Math.exp(-z));
             const riskPct = riskProb * 100;
 
-            // Update UI
-            updateUI(riskPct);
+            updateUI(riskPct, model.baselineRate);
         }
 
-        function updateUI(riskPct) {
-            // Update risk value text
+        function updateUI(riskPct, baselineRate) {
             document.getElementById("risk-percent").textContent = riskPct.toFixed(1) + "%";
 
-            // Update Gauge fill stroke offset
             // Circle circumference = 2 * pi * r (r=90) ~ 565.48
             const circ = 565.48;
             const strokeOffset = circ - (riskPct / 100) * circ;
             const gaugeFill = document.getElementById("risk-gauge");
             gaugeFill.style.strokeDashoffset = strokeOffset;
 
-            // Update status badge, colors, and guidance box
             const riskStatus = document.getElementById("risk-status");
             const guidanceTitle = document.getElementById("guidance-title");
             const guidanceText = document.getElementById("guidance-text");
-            const root = document.documentElement;
 
-            if (riskPct < 10) {
-                // Low Risk
+            // Categorize risk based on baseline rate
+            const moderateThreshold = baselineRate;
+            const highThreshold = baselineRate * 1.5;
+
+            if (riskPct < moderateThreshold) {
                 riskStatus.textContent = "Low Risk";
                 riskStatus.className = "risk-badge low";
                 gaugeFill.style.stroke = "var(--success)";
-                guidanceTitle.textContent = "Low / Standard Risk Profile";
-                guidanceText.textContent = "Risk is below the average cohort baseline. Maintain a healthy, balanced diet rich in natural iron (e.g. spinach, legumes, lean meat), take standard prenatal vitamins as prescribed by your practitioner, and schedule routine prenatal screenings.";
-            } else if (riskPct >= 10 && riskPct < 22) {
-                // Moderate Risk
+                guidanceTitle.textContent = "Standard / Below-Baseline Risk Profile";
+                guidanceText.textContent = `Predicted risk is below the country cohort baseline (${baselineRate.toFixed(1)}%). Maintain standard nutrition practices: take daily prenatal supplements containing iron and folic acid, eat a balanced diet rich in leafy greens, and attend routine antenatal check-ups.`;
+            } else if (riskPct >= moderateThreshold && riskPct < highThreshold) {
                 riskStatus.textContent = "Moderate Risk";
                 riskStatus.className = "risk-badge moderate";
                 gaugeFill.style.stroke = "var(--warning)";
                 guidanceTitle.textContent = "Moderate Risk Profile";
-                guidanceText.textContent = "Risk sits slightly above average. Discuss dietary choices with your obstetric provider, ensure compliance with iron-inclusive prenatal supplements, and pay attention to signs of iron depletion (fatigue, pale skin, cold extremities).";
+                guidanceText.textContent = `Predicted risk is elevated above the baseline (${baselineRate.toFixed(1)}%). Discuss nutritional support options with your healthcare provider. Ensure compliance with iron supplements. In rural settings, pay special attention to clean drinking water sources to prevent gastrointestinal parasites.`;
             } else {
-                // High Risk
                 riskStatus.textContent = "High Risk";
                 riskStatus.className = "risk-badge high";
                 gaugeFill.style.stroke = "var(--danger)";
                 guidanceTitle.textContent = "Elevated Risk Profile";
-                guidanceText.textContent = "Risk is significantly elevated. A consultative review of maternal health and hemoglobin/ferritin status is highly recommended. Discuss iron supplementation options, check-ups frequencies, and nutritional targets directly with your healthcare provider.";
+                guidanceText.textContent = `Risk is significantly elevated above the national cohort baseline. Obsteric guidelines recommend checking maternal hemoglobin levels via a complete blood count (CBC). Discuss high-dose oral iron therapy or other prophylactic measures directly with your healthcare provider as soon as possible.`;
             }
         }
 
-        // Initialize risk calculation on load
+        // Initialize
         window.addEventListener("DOMContentLoaded", () => {
-            calculateRisk();
+            switchCohort("nhanes");
         });
     </script>
 </body>

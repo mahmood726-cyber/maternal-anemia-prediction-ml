@@ -1,0 +1,27 @@
+=== UGANDA Anemia Prediction ML Model Summary ===
+Total Cohort Size (Clean): 1000
+Anemic Cases: 429 (42.90%)
+Non-Anemic Cases: 571
+
+--- Out-of-Fold Performance (5-Fold Stratified CV) ---
+
+Logistic Regression:
+  Accuracy:  0.5490
+  ROC AUC:   0.5482
+  Precision: 0.4779
+  Recall:    0.5222
+  F1-Score:  0.4982
+
+Random Forest:
+  Accuracy:  0.5830
+  ROC AUC:   0.5622
+  Precision: 0.5128
+  Recall:    0.5384
+  F1-Score:  0.5247
+
+Gradient Boosting:
+  Accuracy:  0.5710
+  ROC AUC:   0.5605
+  Precision: 0.5018
+  Recall:    0.3778
+  F1-Score:  0.4296
